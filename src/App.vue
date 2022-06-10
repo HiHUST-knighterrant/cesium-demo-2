@@ -3,7 +3,7 @@
   <div
     id="app"
     style="width: 100%; height: 100%; position: relative">
-    <!-- <div
+    <div
       class="nav">
       <router-link
         v-for="(item, index) of visibleRouters"
@@ -12,7 +12,7 @@
         {{ item.name }}
       </router-link>
     </div>
-    <router-view /> -->
+    <router-view />
     <RtspLiveVideo />
   </div>
 </template>
