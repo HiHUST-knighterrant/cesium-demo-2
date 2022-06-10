@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./vue-2.6.10.js"></script>
+    <script src="./jsencrypt.min.js"></script>
+    <script src="./jsWebControl-1.0.0.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <div class="container">
+            <div id="playWnd" class="playWnd" style="left:0;top:0"></div>
+        </div>
+    </div>
+    <script>
+        const app = new Vue({
+            el: '#app',
+            data: {
+                videoUrlList: [],
+                pubKey: '',
+                initCount: 0, // 插件初始化的次数
+                oWebControl: null
+            },
+            mounted() {
+                this.getUrl()
+            },
+            methods: {
+                // 获取公钥
+                getPubKey(callback) {
+                    this.oWebControl.JS_RequestInterface({
+                        funcName: "getRSAPubKey",
+                        argument: JSON.stringify({
+                            keyLength: 1024
+                        })
+                    }).then(function (oData) {
+                        if (oData.responseMsg.data) {
+                            this.pubKey = oData.responseMsg.data
+                            console.log('..............获取 pubKey 成功', this.pubKey)
+                            callback()
+                        }
+                    })
+                },
+                // 显示回调信息
+                showCBInfo(szInfo, type) {
+                    // console.log('........CBInfo', szInfo, type)
+                    // if (type === 'error') {
+                    //     szInfo = "<div style='color: red;'>" + dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss") +
+                    //         " " + szInfo +
+                    //         "</div>";
+                    // } else {
+                    //     szInfo = "<div>" + dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss") + " " + szInfo +
+                    //         "</div>";
+                    // }
+                    // document.getElementById("cbInfo").innerHTML += szInfo;
+                },
+                // 设置窗口控制回调
+                setCallbacks() {
+                    const _this = this
+                    this.oWebControl.JS_SetWindowControlCallback({
+                        cbIntegrationCallBack: _this.cbIntegrationCallBack
+                    });
+                },
+                // 推送消息
+                cbIntegrationCallBack(oData) {
+                    this.showCBInfo(JSON.stringify(oData.responseMsg));
+                },
+                // 开始预览视频
+                startPreview() {
+                    const _this = this
+                    // let _list = [{
+                    //     "cameraIndexCode": "1",
+                    //     "streamMode": 0,
+                    //     "cameraName": "指挥中心",
+                    //     // "url": "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mp4", // 用 EasyPlayer 可播放
+                    //     "url": "rtsp://21.47.39.26:554/openUrl/4CnOWkw",
+                    //     "deviceType": 4,
+                    //     "smallEagleEyeAbility": 0,
+                    //     "gpuMode": 0,
+                    //     "wndId": 1
+                    // }]
+                    // let _list = list.replace(/(\s*)/g, "")
+                    let _argument = JSON.stringify({
+                        list: this.videoUrlList
+                    })
+                    this.oWebControl.JS_RequestInterface({
+                        funcName: "startMultiPreview",
+                        argument: _argument
+                    }).then(function (oData) {
+                        console.log(
+                            '..............播放视频',
+                            oData)
+                        _this.showCBInfo(JSON
+                            .stringify(
+                                oData ?
+                                oData
+                                .responseMsg :
+                                ''))
+                    })
+                },
+                // 初始化视频
+                initVideo() {
+                    const _this = this
+                    this.oWebControl.JS_RequestInterface({
+                        funcName: "init",
+                        argument: JSON.stringify({
+                            playMode: 0, // 预览
+                            snapDir: 'd:\\SnapDir',
+                            videoDir: 'd:\\VideoDir',
+                            layout: '2x2',
+                            showToolbar: 1,
+                            showIntelligent: 1,
+                            buttonIDs: '0,16,256,257,258'
+                            // enableHTTPS: _this.enableHttps,
+                            // showToolbar: _this.showToolbar,
+                            // showSmart: _this.showSmart,
+                            // buttonIDs: btIds,
+                            // encryptedFields: encryptedFields
+                        })
+                    }).then(function (oData) {
+                        console.log('.......初始化视频成功', oData)
+                        _this.showCBInfo(JSON.stringify(oData ?
+                            oData
+                            .responseMsg :
+                            ''));
+                        // oWebControl.JS_Resize(1800,
+                        //     900
+                        // ); // 初始化后resize一次，规避firefox下首次显示窗口后插件窗口未与DIV窗口重合问题
+                        // 播放视频
+                        _this.startPreview()
+                    });
+                },
+                // 初始化插件
+                initPlugin() {
+                    const _this = this
+                    this.oWebControl = new WebControl({
+                        szPluginContainer: "playWnd",
+                        iServicePortStart: 15900,
+                        iServicePortEnd: 15909,
+                        cbConnectSuccess: function () {
+                            _this.setCallbacks();
+                            _this.oWebControl.JS_StartService("window", {
+                                dllPath: "./VideoPluginConnect.dll"
+                                //dllPath: "./DllForTest-Win32.dll"
+                            }).then(function () {
+                                _this.oWebControl.JS_CreateWnd("playWnd", 700, 400).then(
+                                    function () {
+                                        console.log("........添加窗口成功")
+                                        // 预览视频
+                                        _this.getPubKey(function () {
+                                            _this.initVideo()
+                                        })
+
+                                    });
+                            }, function () {
+
+                            });
+                        },
+                        cbConnectError: function () {
+                            console.log('...............连接失败，尝试重新启动')
+                            _this.oWebControl = null;
+                            WebControl.JS_WakeUp("VideoWebPlugin://");
+                            _this.initCount++;
+                            if (initCount < 3) {
+                                setTimeout(function () {
+                                    _this.initPlugin();
+                                }, 3000)
+                            } else {
+                                console.log('.............插件启动失败，请检查插件是否安装！')
+                            }
+                        },
+                        cbConnectClose: function () {
+                            console.log("........连接关闭");
+                            _this.oWebControl = null;
+                        }
+                    })
+                },
+                // 获取视频流地址
+                getUrl() {
+                    this.videoUrlList = [{
+                        "cameraIndexCode": "1",
+                        "streamMode": 0,
+                        "cameraName": "指挥中心",
+                        // "url": "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mp4", // 用 EasyPlayer 可播放
+                        "url": "rtsp://21.47.39.26:554/openUrl/4CnOWkw",
+                        "deviceType": 4,
+                        "smallEagleEyeAbility": 0,
+                        "gpuMode": 0,
+                        "wndId": 1
+                    }]
+                    this.initPlugin()
+                }
+            }
+        })
+    </script>
+    <style>
+    </style>
+</body>
+
+</html>

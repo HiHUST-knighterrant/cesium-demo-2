@@ -1,0 +1,1174 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<title>江苏无人机示范区机巢</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="Pragma" content="no-cache" />
+		<meta http-equiv="Cache-Control" content="no-cache, must-revalidate" />
+		<meta http-equiv="Expires" content="0" />
+	</head>
+	<style>
+		html,
+		body {
+			padding: 0;
+			margin: 0;
+		}
+
+		.playWnd {
+			margin: 5px 0 0 5px;
+			width: 100%;
+			height: 100%;
+			border: 1px solid white;
+		}
+
+		.cbInfoDiv {
+			float: left;
+			width: 360px;
+			margin-left: 16px;
+			border: 1px solid #7F9DB9;
+		}
+
+		.cbInfo {
+			height: 200px;
+			padding: 5px;
+			border: 1px solid #7F9DB9;
+			overflow: auto;
+			word-break: break-all;
+		}
+
+		.operate {
+			margin-top: 24px;
+			display: none;
+		}
+
+		.operate::after {
+			content: '';
+			display: none;
+			clear: both;
+		}
+
+		.operate .btns {
+			height: 32px;
+		}
+
+		.module {
+			float: left;
+			width: 390px;
+			min-height: 320px;
+			margin-left: 16px;
+			padding: 16px 8px;
+			box-sizing: border-box;
+			border: 1px solid #e5e5e5;
+		}
+
+		.module .item {
+			margin-bottom: 4px;
+		}
+
+		.module .label {
+			width: 150px;
+			display: inline-block;
+			vertical-align: middle;
+			margin-right: 8px;
+			text-align: right;
+		}
+
+		.module input[type="text"],
+		.module select {
+			box-sizing: border-box;
+			display: inline-block;
+			vertical-align: middle;
+			margin-left: 0;
+			width: 150px;
+			min-height: 20px;
+		}
+
+		.module .btn {
+			min-width: 80px;
+			min-height: 24px;
+			margin-top: 16px;
+			margin-left: 158px;
+		}
+	</style>
+	<body>
+		<div id="playWnd" class="playWnd" style="left: 109px; top: 133px;"></div>
+		<div id="operate" class="operate">
+			<div class="module">
+				<div class="item"><span class="label">抓图存储路径:</span><input id="snapDir" type="text" value="D:\SnapDir">
+				</div>
+				<div class="item"><span class="label">录像存储路径:</span><input id="videoDir" type="text"
+						value="D:\VideoDir"></div>
+				<div class="item">
+					<span class="label">窗口布局:</span>
+					<select id="layout" value="3+4">
+						<option value="1x1">1x1</option>
+						<option value="2x2" >2x2</option>
+						<option value="3x3">3x3</option>
+						<option value="4x4">4x4</option>
+						<option value="5x5">5x5</option>
+						<option value="1x2">1x2</option>
+						<option value="1x4">1x4</option>
+						<option value="4x6">4x6</option>
+						<option value="1+2">1+2</option>
+						<option value="1+5">1+5</option>
+						<option value="1+7">1+7</option>
+						<option value="1+8">1+8</option>
+						<option value="1+9">1+9</option>
+						<option value="1+12">1+12</option>
+						<option value="1+16">1+16</option>
+						<option value="4+9">4+9</option>
+						<option value="1+1+12">1+1+12</option>
+						<option value="3+4" selected>3+4</option>
+					</select>
+				</div>
+				<div class="item">
+					<span class="label">显示工具栏</span>
+					<select id="isShowToolbar" value="1">
+						<option value="0">隐藏</option>
+						<option value="1" selected>显示</option>
+					</select>
+				</div>
+				<div class="item">
+					<span class="label">显示智能信息</span>
+					<select id="isShowSmart" value="1">
+						<option value="0">隐藏</option>
+						<option value="1" selected>显示</option>
+					</select>
+				</div>
+				<div class="item"><span class="label">工具条按钮ID集:</span><input id="btId" type="text"
+						value="0,16,256,257,258,259,260,512,513,514,515,516,517,768,769"></div>
+				<div class="item">
+					<span class="label">加密字段:</span>
+					<div style="display: inline-block; vertical-align: top;">
+						<label><input class="encryptedFields" type="checkbox" value="snapDir">抓图路径</label><br>
+						<label><input class="encryptedFields" type="checkbox" value="videoDir">录像路径</label><br>
+						<label><input class="encryptedFields" type="checkbox" value="layout">布局</label>
+					</div>
+				</div>
+				<div class="item">
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button
+						style="width:10px;padding:0;margin:0;" id="init" class="btn">初始化</button>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button
+						style="width:10px;padding:0;margin:0;" id="uninit" class="btn">反初始化</button>
+				</div>
+
+				<div class="item">
+					&nbsp;&nbsp;&nbsp;
+					<span style="width:50px;padding:0;margin:0;" class="label">布局：</span>
+				</div>
+				<div class="item">
+					<span class="label">设置布局:</span>
+					<select id="setlayout" value="3+4">
+						<option value="1x1">1x1</option>
+						<option value="2x2" >2x2</option>
+						<option value="3x3">3x3</option>
+						<option value="4x4">4x4</option>
+						<option value="5x5">5x5</option>
+						<option value="1x2">1x2</option>
+						<option value="1x4">1x4</option>
+						<option value="4x6">4x6</option>
+						<option value="1+2">1+2</option>
+						<option value="1+5">1+5</option>
+						<option value="1+7">1+7</option>
+						<option value="1+8">1+8</option>
+						<option value="1+9">1+9</option>
+						<option value="1+12">1+12</option>
+						<option value="1+16">1+16</option>
+						<option value="4+9">4+9</option>
+						<option value="1+1+12">1+1+12</option>
+						<option value="3+4" selected>3+4</option>
+					</select>
+				</div>
+				<div class="item">
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<button style="width:10px;padding:0;margin:0;" id="SetLayout" class="btn">设置布局</button>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<button style="width:10px;padding:0;margin:0;" id="GetLayout" class="btn">获取布局</button>
+				</div>
+
+				<div class="item">
+					&nbsp;&nbsp;&nbsp;
+					<span style="width:200px;padding:0;margin:0;" class="label">主子码流切换和语音对讲：</span>
+				</div>
+				<div class="item"><span class="label">窗口ID:</span><input id="talkAndChgStreamWndID" type="text"></div>
+				<div class="item"><span class="label">URL:</span><input id="talkAndChgStreamURL" type="text"></div>
+				<div class="item"><span class="label">预览模式:</span><input id="playMode" type="text"></div>
+				<div class="item">
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<button style="width:100px;padding:0;margin:0;" id="startTalk" class="btn">开始语音对讲</button>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<button style="width:100px;padding:0;margin:0;" id="chgStreamType" class="btn">单路预览</button>
+				</div>
+			</div>
+			<div class="module" style="height:50;width:420;padding:10;margin:10;">
+				<div class="item">
+					<span class="label">预览参数：</span><textarea id="previewParam" type="text"
+						style="width:370px;height:350px;">{
+					"list":
+						[{
+						"cameraIndexCode": "7291aa56655a47ec95b467058d5439ae",
+						"streamMode": 0,
+						"cameraName": "机库顶",
+						"url": "rtsp://192.168.1.10:554/user=admin&password=&channel=1",
+						"deviceType": 4,
+						"smallEagleEyeAbility": 0,
+						"gpuMode": 0,
+						"wndId": 1
+						},{
+						"cameraIndexCode": "7291aa56655a47ec95b467058d5439ae",
+						"streamMode": 0,
+						"cameraName": "机库左",
+						"url": "rtsp://222.190.65.16:554/openUrl/gskmhG0",
+						"deviceType": 4,
+						"smallEagleEyeAbility": 0,
+						"gpuMode": 0,
+						"wndId": 2
+						},{
+						"cameraIndexCode": "7291aa56655a47ec95b467058d5439ae",
+						"streamMode": 0,
+						"cameraName": "机库右",
+						"url": "rtsp://222.190.65.16:554/openUrl/hfw4zba",
+						"deviceType": 4,
+						"smallEagleEyeAbility": 0,
+						"gpuMode": 0,
+						"wndId": 3
+						},{
+						"cameraIndexCode": "7291aa56655a47ec95b467058d5439ae",
+						"streamMode": 0,
+						"cameraName": "机库右",
+						"url": "rtsp://222.190.65.16:554/openUrl/UuA1DPi",
+						"deviceType": 4,
+						"smallEagleEyeAbility": 0,
+						"gpuMode": 0,
+						"wndId": 4
+						}]
+						}</textarea>
+				</div>
+				<div class="item">
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<button style="width:20px;padding:0;margin:0;" id="startPreview" class="btn">预览</button>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<button style="width:;padding:0;margin:0;" id="stopAllPreview" class="btn">停止全部预览</button>
+				</div>
+				<div class="item">
+					<span style="width:120px;padding:0;margin:0;" class="label">停止预览：</span>
+				</div>
+				<div class="item"><span class="label">窗口ID:</span><input id="StopWndID" type="text"></div>
+				<div class="item">
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<button style="width:;padding:0;margin:0;" id="stopBtn" class="btn">停止预览</button>
+				</div>
+
+			</div>
+
+			<!--字符叠加和抓图 -->
+			<div class="module" style="height:50xp;padding:10;margin:10;">
+				<div class="item">
+					&nbsp;&nbsp;&nbsp;
+					<span style="width:50px;padding:0;margin:0;" class="label">抓图：</span>
+				</div>
+				<div class="item">
+					<span class="label">抓图模式：</span>
+					<select id="SnapType" onchange="UpdateSnapTypeValue()" value="0">
+						<option value="0" selected>选中窗口抓图</option>
+						<option value="1">指定窗口抓图</option>
+					</select>
+				</div>
+				<div class="item" id="SnapShotWndId" style="display: none;">
+					<span class="label">窗口ID：</span>
+					<select id="SnapWndId" value="0">
+					</select>
+				</div>
+				<div class="item">
+					&nbsp;&nbsp;
+					<span style="padding:0;margin:0;" class="label">图片绝对路径名称：</span>
+					<input id="snapName" type="text" value="d:\SnapDir\test.jpg">
+				</div>
+				<div class="item">
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<button style="width:10px;padding:0;margin:0;" id="SnapPic" class="btn">预览抓图</button>
+				</div>
+				<!--字符叠加 -->
+				<div class="item">
+					<span style="width:100px;padding:0;margin:0;" class="label">字符串叠加：</span>
+				</div>
+				<div class="item">
+					<span class="label">叠加模式：</span>
+					<select id="SetOSDType" onchange="UpdateSetOSDTypeValue()" value="0">
+						<option value="0" selected>选中窗口字符串叠加</option>
+						<option value="1">指定窗口字符串叠加</option>
+					</select>
+				</div>
+				<div class="item" id="SetOSDWndId" style="display: none;">
+					<span class="label">窗口ID：</span>
+					<select id="osdWndId" value="0">
+					</select>
+				</div>
+				<div class="item">
+					<span class="label">起点X坐标：</span><input id="Xsite" type="text" value="0" maxlength="4"
+						onkeyup="JavaScript:textbox(this, 0, 1000)" placeholder="请输入0~1000的数字">
+					<span class="label">起点Y坐标：</span><input id="Ysite" type="text" value="0" maxlength="4"
+						onkeyup="JavaScript:textbox(this, 0, 1000)" placeholder="请输入0~1000的数字">
+					<span class="label" style="width:150px;padding:0;margin:0;">字体RGB颜色：</span>
+					<input id="RColor" type="text" style="width:50px;padding:0;margin:0;" value="255" maxlength="3"
+						onkeyup="JavaScript:textbox(this, 0, 255)">
+					<input id="GColor" type="text" style="width:50px;padding:0;margin:0;" value="0" maxlength="3"
+						onkeyup="JavaScript:textbox(this, 0, 255)">
+					<input id="BColor" type="text" style="width:50px;padding:0;margin:0;" value="0" maxlength="3"
+						onkeyup="JavaScript:textbox(this, 0, 255)">
+					<span class="label">待叠加字符串：</span><textarea id="OSDText" type="text"
+						style="width:320px;height:100px;" value="20"></textarea>
+				</div>
+				<div class="item">
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<button style="width:;padding:0;margin:0;" id="setOSDText" class="btn">字符串叠加</button>
+				</div>
+
+				<div class="item">
+					<span style="width:120px;padding:0;margin:0;" class="label">恢复按钮状态：</span>
+				</div>
+				<div class="item"><span class="label">窗口ID:</span><input id="restoreWndID" type="text"></div>
+				<div class="item"><span class="label">按钮ID:</span><input id="buttonID" type="text"></div>
+				<div class="item">
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<button style="width:;padding:0;margin:0;" id="restoreBtnStatus" class="btn">恢复按钮状态</button>
+				</div>
+			</div>
+			<fieldset class="cbInfoDiv">
+				<legend>返回值信息</legend>
+				<div id="cbInfo" class="cbInfo"></div>
+				<button id="clear">清空</button>
+			</fieldset>
+		</div>
+	</body>
+	<script src="jquery-1.12.4.min.js"></script>
+	<script src="jsencrypt.min.js"></script>
+	<script src="jsWebControl-1.0.0.min.js"></script>
+
+	<script type="text/javascript">
+		var videoListJson = {
+			"list": [{
+				"cameraIndexCode": "7291aa56655a47ec95b467058d5439ae",
+				"streamMode": 0,
+				"cameraName": "指挥中心",
+				"url": "rtsp://192.168.1.10:554/user=admin&password=&channel=1",
+				"deviceType": 4,
+				"smallEagleEyeAbility": 0,
+				"gpuMode": 0,
+				"wndId": 1
+			}, {
+				"cameraIndexCode": "7291aa56655a47ec95b467058d5439ae",
+				"streamMode": 0,
+				"cameraName": "祝塘变",
+				"url": "rtsp://222.190.65.16:554/openUrl/gskmhG0",
+				"deviceType": 4,
+				"smallEagleEyeAbility": 0,
+				"gpuMode": 0,
+				"wndId": 2
+			}, {
+				"cameraIndexCode": "7291aa56655a47ec95b467058d5439ae",
+				"streamMode": 0,
+				"cameraName": "芙蓉变",
+				"url": "rtsp://222.190.65.16:554/openUrl/hfw4zba",
+				"deviceType": 4,
+				"smallEagleEyeAbility": 0,
+				"gpuMode": 0,
+				"wndId": 3
+			}, {
+				"cameraIndexCode": "7291aa56655a47ec95b467058d5439ae",
+				"streamMode": 0,
+				"cameraName": "璜南变",
+				"url": "rtsp://222.190.65.16:554/openUrl/UuA1DPi",
+				"deviceType": 4,
+				"smallEagleEyeAbility": 0,
+				"gpuMode": 0,
+				"wndId": 4
+			}, {
+				"cameraIndexCode": "7291aa56655a47ec95b467058d5439ae",
+				"streamMode": 0,
+				"cameraName": "暨阳变",
+				"url": "rtsp://222.190.65.16:554/openUrl/UuA1DPi",
+				"deviceType": 4,
+				"smallEagleEyeAbility": 0,
+				"gpuMode": 0,
+				"wndId": 5
+			},{
+				"cameraIndexCode": "7291aa56655a47ec95b467058d5439ae",
+				"streamMode": 0,
+				"cameraName": "南运变",
+				"url": "rtsp://222.190.65.16:554/openUrl/UuA1DPi",
+				"deviceType": 4,
+				"smallEagleEyeAbility": 0,
+				"gpuMode": 0,
+				"wndId": 6
+			},{
+				"cameraIndexCode": "7291aa56655a47ec95b467058d5439ae",
+				"streamMode": 0,
+				"cameraName": "邓阳变",
+				"url": "rtsp://222.190.65.16:554/openUrl/UuA1DPi",
+				"deviceType": 4,
+				"smallEagleEyeAbility": 0,
+				"gpuMode": 0,
+				"wndId": 7
+			}]
+		};
+
+
+
+
+
+		var oWebControl = null; // 插件对象
+		var bIE = (!!window.ActiveXObject || 'ActiveXObject' in window); // 是否为IE浏览器
+		var pubKey = '';
+		var initCount = 0;
+
+		function UpdateValue() {
+			var sel = document.getElementById("isHttps");
+			var selectedId = sel.selectedIndex;
+			var v = sel.options[selectedId].value;
+			if (0 == v) {
+				document.getElementById("port").value = 80;
+			} else {
+				document.getElementById("port").value = 443;
+			}
+		}
+
+		function UpdateSnapTypeValue() {
+			var sel = document.getElementById("SnapType");
+			var selectedId = sel.selectedIndex;
+			var v = sel.options[selectedId].value;
+			if (1 == v) {
+				//获取布局，并显示标签和窗口选择下拉框
+				document.getElementById("SnapShotWndId").style.display = ""; //显示
+				oWebControl.JS_RequestInterface({
+					funcName: "getLayout"
+				}).then(function(oData) {
+					//分析窗口数
+					var Data = JSON.stringify(oData.responseMsg.data);
+					Data = Data.replace(/\\n/g, "");
+					Data = Data.replace(/\\/g, "");
+					Data = Data.replace(/\"{/g, "{");
+					Data = Data.replace(/}\"/g, "}");
+					var DataNum = JSON.parse(Data).wndNum;
+
+					createSnapSelectOption(DataNum);
+				});
+			} else {
+				//隐藏标签和窗口选择下拉框
+				document.getElementById("SnapShotWndId").style.display = "none"; //隐藏
+			}
+		}
+
+		function createSnapSelectOption(wndNum) {
+			var _html = "";
+			//先清空之后再添加
+			$("#SnapWndId").empty();
+			for (var _i = 0; _i < wndNum; _i++) {
+				_html = _html + "<option value='" + (_i + 1) + "'>" + (_i + 1) + "</option>";
+			}
+			$("#SnapWndId").append(_html);
+		}
+
+		function UpdateSetOSDTypeValue() {
+			var sel = document.getElementById("SetOSDType");
+			var selectedId = sel.selectedIndex;
+			var v = sel.options[selectedId].value;
+			if (1 == v) {
+				//获取布局，并显示标签和窗口选择下拉框
+				document.getElementById("SetOSDWndId").style.display = ""; //显示
+				oWebControl.JS_RequestInterface({
+					funcName: "getLayout"
+				}).then(function(oData) {
+					//分析窗口数
+					var Data = JSON.stringify(oData.responseMsg.data);
+					Data = Data.replace(/\\n/g, "");
+					Data = Data.replace(/\\/g, "");
+					Data = Data.replace(/\"{/g, "{");
+					Data = Data.replace(/}\"/g, "}");
+					var DataNum = JSON.parse(Data).wndNum;
+
+					createSetOSDSelectOption(DataNum);
+				});
+			} else {
+				//隐藏标签和窗口选择下拉框
+				document.getElementById("SetOSDWndId").style.display = "none"; //隐藏
+			}
+		}
+
+		function createSetOSDSelectOption(wndNum) {
+			var _html = "";
+			//先清空之后再添加
+			$("#osdWndId").empty();
+			for (var _i = 0; _i < wndNum; _i++) {
+				_html = _html + "<option value='" + (_i + 1) + "'>" + (_i + 1) + "</option>";
+			}
+			$("#osdWndId").append(_html);
+		}
+
+		// 标签关闭
+		$(window).unload(function() {
+			if (oWebControl != null) {
+				oWebControl.JS_HideWnd(); // 先让窗口隐藏，规避可能的插件窗口滞后于浏览器消失问题
+				oWebControl.JS_Disconnect().then(function() {}, function() {});
+			}
+		});
+
+		// 窗口resize
+		$(window).resize(function() {
+			if (oWebControl != null) {
+				oWebControl.JS_Resize(1800, 900);
+				setWndCover();
+			}
+		});
+
+		// 滚动条scroll
+		$(window).scroll(function() {
+			if (oWebControl != null) {
+				oWebControl.JS_Resize(1800, 900);
+				setWndCover();
+			}
+		});
+
+		// 设置窗口裁剪，当因滚动条滚动导致窗口需要被遮住的情况下需要JS_CuttingPartWindow部分窗口
+		function setWndCover() {
+			var iWidth = $(window).width();
+			var iHeight = $(window).height();
+			var oDivRect = $("#playWnd").get(0).getBoundingClientRect();
+
+			var iCoverLeft = (oDivRect.left < 0) ? Math.abs(oDivRect.left) : 0;
+			var iCoverTop = (oDivRect.top < 0) ? Math.abs(oDivRect.top) : 0;
+			var iCoverRight = (oDivRect.right - iWidth > 0) ? Math.round(oDivRect.right - iWidth) : 0;
+			var iCoverBottom = (oDivRect.bottom - iHeight > 0) ? Math.round(oDivRect.bottom - iHeight) : 0;
+
+			iCoverLeft = (iCoverLeft > 1800) ? 1800 : iCoverLeft;
+			iCoverTop = (iCoverTop > 900) ? 900 : iCoverTop;
+			iCoverRight = (iCoverRight > 1800) ? 1800 : iCoverRight;
+			iCoverBottom = (iCoverBottom > 900) ? 900 : iCoverBottom;
+
+			oWebControl.JS_RepairPartWindow(0, 0, 701, 900); // 多1个像素点防止还原后边界缺失一个像素条
+			if (iCoverLeft != 0) {
+				oWebControl.JS_CuttingPartWindow(0, 0, iCoverLeft, 900);
+			}
+			if (iCoverTop != 0) {
+				oWebControl.JS_CuttingPartWindow(0, 0, 701, iCoverTop); // 多剪掉一个像素条，防止出现剪掉一部分窗口后出现一个像素条
+			}
+			if (iCoverRight != 0) {
+				oWebControl.JS_CuttingPartWindow(1800 - iCoverRight, 0, iCoverRight, 900);
+			}
+			if (iCoverBottom != 0) {
+				oWebControl.JS_CuttingPartWindow(0, 900 - iCoverBottom, 1800, iCoverBottom);
+			}
+		}
+
+		// 初始化插件
+		function initPlugin() {
+			oWebControl = new WebControl({
+				szPluginContainer: "playWnd",
+				iServicePortStart: 15900,
+				iServicePortEnd: 15909,
+				szClassId: "23BF3B0A-2C56-4D97-9C03-0CB103AA8F11", // 用于IE10使用ActiveX的clsid
+				cbConnectSuccess: function() {
+					setCallbacks();
+					oWebControl.JS_StartService("window", {
+						dllPath: "./VideoPluginConnect.dll"
+					}).then(function() {
+						oWebControl.JS_CreateWnd("playWnd", 1800, 900).then(function() {
+							console.log("JS_CreateWnd success");
+							initVideo();
+						});
+					}, function() {
+
+					});
+				},
+				cbConnectError: function() {
+					console.log("cbConnectError");
+					oWebControl = null;
+					$("#playWnd").html("插件未启动，正在尝试启动，请稍候...");
+					WebControl.JS_WakeUp("VideoWebPlugin://");
+					initCount++;
+					if (initCount < 3) {
+						setTimeout(function() {
+							initPlugin();
+						}, 3000)
+					} else {
+						$("#playWnd").html("插件启动失败，请检查插件是否安装！");
+					}
+				},
+				cbConnectClose: function(bNormalClose) {
+					// 异常断开：bNormalClose = false
+					// JS_Disconnect正常断开：bNormalClose = true
+					console.log("cbConnectClose");
+					oWebControl = null;
+				}
+			});
+		}
+
+		//initPlugin();
+
+		// 获取公钥
+		function getPubKey(callback) {
+			oWebControl.JS_RequestInterface({
+				funcName: "getRSAPubKey",
+				argument: JSON.stringify({
+					keyLength: 1024
+				})
+			}).then(function(oData) {
+				console.log(oData)
+				if (oData.responseMsg.data) {
+					pubKey = oData.responseMsg.data
+					callback()
+				}
+			})
+		}
+
+		// 设置窗口控制回调
+		function setCallbacks() {
+			oWebControl.JS_SetWindowControlCallback({
+				cbIntegrationCallBack: cbIntegrationCallBack
+			});
+		}
+
+		// 推送消息
+		function cbIntegrationCallBack(oData) {
+			showCBInfo(JSON.stringify(oData.responseMsg));
+		}
+
+		// RSA加密
+		function setEncrypt(value) {
+			var encrypt = new JSEncrypt();
+			encrypt.setPublicKey(pubKey);
+			return encrypt.encrypt(value);
+		}
+
+		function initVideo() {
+			var snapDir = $("#snapDir").val();
+			var videoDir = $("#videoDir").val();
+			var layout = $("#layout").val();
+			var encryptedFields = ['secret'];
+			var szShowToolbar = $("#isShowToolbar").val();
+			var szShowSmart = $("#isShowSmart").val();
+			var btIds = $("#btId").val();
+
+			snapDir = snapDir.replace(/(^\s*)/g, "");
+			snapDir = snapDir.replace(/(\s*$)/g, "");
+
+			videoDir = videoDir.replace(/(^\s*)/g, "");
+			videoDir = videoDir.replace(/(\s*$)/g, "");
+
+			var showSmart = parseInt(szShowSmart);
+			var showToolbar = parseInt(szShowToolbar);
+			var enableHttps = parseInt($("#isHttps").val());
+			$(".encryptedFields").each(function(index, item) {
+				var $item = $(item);
+				if ($item.prop('checked')) {
+					var value = $item.val();
+
+					if (value == 'snapDir') {
+						snapDir = setEncrypt(snapDir)
+					}
+					if (value == 'videoDir') {
+						videoDir = setEncrypt(videoDir)
+					}
+					if (value == 'layout') {
+						layout = setEncrypt(layout)
+					}
+				}
+			})
+			encryptedFields = encryptedFields.join(",");
+
+			console.log({
+				playMode: 0, // 预览
+				snapDir: snapDir,
+				videoDir: videoDir,
+				layout: layout,
+				enableHTTPS: enableHttps,
+				showToolbar: showToolbar,
+				showSmart: showSmart,
+				buttonIDs: btIds,
+				encryptedFields: encryptedFields
+			})
+
+			oWebControl.JS_RequestInterface({
+				funcName: "init",
+				argument: JSON.stringify({
+					playMode: 0, // 预览
+					snapDir: snapDir,
+					videoDir: videoDir,
+					layout: layout,
+					enableHTTPS: enableHttps,
+					showToolbar: showToolbar,
+					showSmart: showSmart,
+					buttonIDs: btIds,
+					encryptedFields: encryptedFields
+				})
+			}).then(function(oData) {
+				showCBInfo(JSON.stringify(oData ? oData.responseMsg : ''));
+				UpdateSnapTypeValue();
+				UpdateSetOSDTypeValue();
+				oWebControl.JS_Resize(1800, 900); // 初始化后resize一次，规避firefox下首次显示窗口后插件窗口未与DIV窗口重合问题
+				startPreview();
+			});
+		}
+
+		// 初始化
+		$("#init").click(function() {
+			getPubKey(function() {
+				var snapDir = $("#snapDir").val();
+				var videoDir = $("#videoDir").val();
+				var layout = $("#layout").val();
+				var encryptedFields = ['secret'];
+				var szShowToolbar = $("#isShowToolbar").val();
+				var szShowSmart = $("#isShowSmart").val();
+				var btIds = $("#btId").val();
+
+				snapDir = snapDir.replace(/(^\s*)/g, "");
+				snapDir = snapDir.replace(/(\s*$)/g, "");
+
+				videoDir = videoDir.replace(/(^\s*)/g, "");
+				videoDir = videoDir.replace(/(\s*$)/g, "");
+
+				var showSmart = parseInt(szShowSmart);
+				var showToolbar = parseInt(szShowToolbar);
+				var enableHttps = parseInt($("#isHttps").val());
+				$(".encryptedFields").each(function(index, item) {
+					var $item = $(item);
+					if ($item.prop('checked')) {
+						var value = $item.val();
+
+						if (value == 'snapDir') {
+							snapDir = setEncrypt(snapDir)
+						}
+						if (value == 'videoDir') {
+							videoDir = setEncrypt(videoDir)
+						}
+						if (value == 'layout') {
+							layout = setEncrypt(layout)
+						}
+					}
+				})
+				encryptedFields = encryptedFields.join(",");
+
+				console.log({
+					playMode: 0, // 预览
+					snapDir: snapDir,
+					videoDir: videoDir,
+					layout: layout,
+					enableHTTPS: enableHttps,
+					showToolbar: showToolbar,
+					showSmart: showSmart,
+					buttonIDs: btIds,
+					encryptedFields: encryptedFields
+				})
+
+				oWebControl.JS_RequestInterface({
+					funcName: "init",
+					argument: JSON.stringify({
+						playMode: 0, // 预览
+						snapDir: snapDir,
+						videoDir: videoDir,
+						layout: layout,
+						enableHTTPS: enableHttps,
+						showToolbar: showToolbar,
+						showSmart: showSmart,
+						buttonIDs: btIds,
+						encryptedFields: encryptedFields
+					})
+				}).then(function(oData) {
+					showCBInfo(JSON.stringify(oData ? oData.responseMsg : ''));
+					UpdateSnapTypeValue();
+					UpdateSetOSDTypeValue();
+					oWebControl.JS_Resize(1800, 900); // 初始化后resize一次，规避firefox下首次显示窗口后插件窗口未与DIV窗口重合问题
+				});
+			})
+		});
+
+		//设置当前布局
+		$("#SetLayout").click(function() {
+			var layout = $("#setlayout").val();
+
+			oWebControl.JS_RequestInterface({
+				funcName: "setLayout",
+				argument: JSON.stringify({
+					layout: layout
+				})
+			}).then(function(oData) {
+				showCBInfo(JSON.stringify(oData ? oData.responseMsg : ''));
+				UpdateSnapTypeValue();
+				UpdateSetOSDTypeValue();
+			});
+		})
+
+		//获取当前布局
+		$("#GetLayout").click(function() {
+			oWebControl.JS_RequestInterface({
+				funcName: "getLayout"
+			}).then(function(oData) {
+				showCBInfo(JSON.stringify(oData ? oData.responseMsg : ''));
+				UpdateSnapTypeValue();
+				UpdateSetOSDTypeValue();
+			});
+		})
+
+		//抓图
+		$("#SnapPic").click(function() {
+			var snapName = $("#snapName").val();
+			var wndId = 0; //选中窗口抓图
+
+			snapName = snapName.replace(/(^\s*)/g, "");
+			snapName = snapName.replace(/(\s*$)/g, "");
+
+			var sel = document.getElementById("SnapType");
+			var selectedId = sel.selectedIndex;
+			var v = sel.options[selectedId].value;
+			if (1 == v) //指定窗口抓图
+			{
+				wndId = parseInt($("#SnapWndId option:selected").val(), 10);
+			} else if (0 == v) //选中窗口抓图
+			{
+				wndId = 0;
+			}
+
+			oWebControl.JS_RequestInterface({
+				funcName: "snapShot",
+				argument: JSON.stringify({
+					name: snapName,
+					wndId: wndId
+				})
+			}).then(function(oData) {
+				showCBInfo(JSON.stringify(oData ? oData.responseMsg : ''));
+			});
+		})
+
+
+		function startPreview() {
+			var argument = $("#previewParam").val();
+			//删除字符串中的回车换行
+			argument = argument.replace(/(\s*)/g, "");
+			//JSON.parse(argument)是将字符串转换为json对象
+			var JsonArgument = videoListJson; //JSON.parse(argument);
+			console.log(JsonArgument);
+			oWebControl.JS_RequestInterface({
+				funcName: "startMultiPreview",
+				argument: JSON.stringify(JsonArgument)
+			}).then(function(oData) {
+				showCBInfo(JSON.stringify(oData ? oData.responseMsg : ''));
+			});
+		}
+		// 视频预览
+		$("#startPreview").click(function() {
+			var argument = $("#previewParam").val();
+			//删除字符串中的回车换行
+			argument = argument.replace(/(\s*)/g, "");
+			//JSON.parse(argument)是将字符串转换为json对象
+			var JsonArgument = JSON.parse(argument);
+			console.log(JsonArgument);
+			oWebControl.JS_RequestInterface({
+				funcName: "startMultiPreview",
+				argument: JSON.stringify(JsonArgument)
+			}).then(function(oData) {
+				showCBInfo(JSON.stringify(oData ? oData.responseMsg : ''));
+			});
+		})
+
+		//字符叠加
+		$("#setOSDText").click(function() {
+			if (!$("#Xsite").val()) {
+				showCBInfo("起点X坐标不能为空！", 'error');
+				return
+			}
+			if (!$("#Ysite").val()) {
+				showCBInfo("起点Y坐标不能为空！", 'error');
+				return
+			}
+			if (!$("#RColor").val()) {
+				showCBInfo("字体RGB颜色R分量不能为空！", 'error');
+				return
+			}
+			if (!$("#GColor").val()) {
+				showCBInfo("字体RGB颜色G分量不能为空！", 'error');
+				return
+			}
+			if (!$("#BColor").val()) {
+				showCBInfo("字体RGB颜色B分量不能为空！", 'error');
+				return
+			}
+
+			var text = $("#OSDText").val();
+			var x = +$("#Xsite").val();
+			var y = +$("#Ysite").val();
+			var ColorR = parseInt($("#RColor").val());
+			var ColorG = parseInt($("#GColor").val());
+			var ColorB = parseInt($("#BColor").val());
+			var Color = 65536 * ColorB + 256 * ColorG + ColorR;
+			var wndId = 0;
+
+
+			var sel = document.getElementById("SetOSDType");
+			var selectedId = sel.selectedIndex;
+			var v = sel.options[selectedId].value;
+			if (1 == v) //指定窗口字符叠加
+			{
+				wndId = parseInt($("#osdWndId option:selected").val(), 10);
+			} else //空闲窗口字符叠加
+			{
+				wndId = 0;
+			}
+
+			oWebControl.JS_RequestInterface({
+				funcName: "drawOSD",
+				argument: JSON.stringify({
+					text: text,
+					x: x,
+					y: y,
+					color: Color,
+					wndId: wndId
+				})
+			}).then(function(oData) {
+				showCBInfo(JSON.stringify(oData ? oData.responseMsg : ''));
+			});
+		})
+
+		// 停止预览
+		$("#stopAllPreview").click(function() {
+			oWebControl.JS_RequestInterface({
+				funcName: "stopAllPreview"
+			}).then(function(oData) {
+				showCBInfo(JSON.stringify(oData ? oData.responseMsg : ''));
+			});
+		})
+
+		// 停止单个预览
+		$("#stopBtn").click(function() {
+			if (!$("#StopWndID").val()) {
+				showCBInfo("窗口ID不能为空！", 'error');
+				return
+			}
+
+			var wndID = +$("#StopWndID").val();
+			oWebControl.JS_RequestInterface({
+				funcName: "stopPreview",
+				argument: JSON.stringify({
+					wndId: wndID
+				})
+			}).then(function(oData) {
+				showCBInfo(JSON.stringify(oData ? oData.responseMsg : ''));
+			});
+		})
+
+		// 反初始化
+		function uninit() {
+			oWebControl.JS_RequestInterface({
+				funcName: "uninit"
+			}).then(function(oData) {
+				showCBInfo(JSON.stringify(oData ? oData.responseMsg : ''));
+			});
+		}
+		$("#uninit").click(uninit)
+
+		//开始语音对讲
+		$("#startTalk").click(function() {
+			if (!$("#talkAndChgStreamWndID").val()) {
+				showCBInfo("窗口ID不能为空！", 'error');
+				return
+			}
+			if (!$("#talkAndChgStreamURL").val()) {
+				showCBInfo("URL不能为空！", 'error');
+				return
+			}
+
+			var wndID = +$("#talkAndChgStreamWndID").val();
+			var url = $("#talkAndChgStreamURL").val();
+
+			oWebControl.JS_RequestInterface({
+				funcName: "startTalk",
+				argument: JSON.stringify({
+					wndId: wndID,
+					url: url
+				})
+			}).then(function(oData) {
+				showCBInfo(JSON.stringify(oData ? oData.responseMsg : ''));
+			});
+		})
+
+		//主子码流切换
+		$("#chgStreamType").click(function() {
+			if (!$("#talkAndChgStreamWndID").val()) {
+				showCBInfo("窗口ID不能为空！", 'error');
+				return
+			}
+			if (!$("#talkAndChgStreamURL").val()) {
+				showCBInfo("URL不能为空！", 'error');
+				return
+			}
+			if (!$("#playMode").val()) {
+				showCBInfo("预览模式不能为空！", 'error');
+				return
+			}
+
+			var wndID = +$("#talkAndChgStreamWndID").val();
+			var url = $("#talkAndChgStreamURL").val();
+			var playMode = +$("#playMode").val();
+
+			oWebControl.JS_RequestInterface({
+				funcName: "singlePlay",
+				argument: JSON.stringify({
+					wndId: wndID,
+					url: url,
+					playMode: playMode
+				})
+			}).then(function(oData) {
+				showCBInfo(JSON.stringify(oData ? oData.responseMsg : ''));
+			});
+		})
+
+		//恢复按钮状态
+		$("#restoreBtnStatus").click(function() {
+			if (!$("#restoreWndID").val()) {
+				showCBInfo("窗口ID不能为空！", 'error');
+				return
+			}
+			if (!$("#buttonID").val()) {
+				showCBInfo("按钮ID不能为空！", 'error');
+				return
+			}
+
+			var wndID = +$("#restoreWndID").val();
+			var btnID = +$("#buttonID").val();
+
+			oWebControl.JS_RequestInterface({
+				funcName: "restoreButtonStauts",
+				argument: JSON.stringify({
+					wndId: wndID,
+					buttonID: btnID
+				})
+			}).then(function(oData) {
+				showCBInfo(JSON.stringify(oData ? oData.responseMsg : ''));
+			});
+		})
+
+
+		// 显示回调信息
+		function showCBInfo(szInfo, type) {
+			if (type === 'error') {
+				szInfo = "<div style='color: red;'>" + dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss") + " " + szInfo +
+					"</div>";
+			} else {
+				szInfo = "<div>" + dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss") + " " + szInfo + "</div>";
+			}
+			$("#cbInfo").html(szInfo + $("#cbInfo").html());
+		}
+
+		$("#clear").click(function() {
+			$("#cbInfo").html('');
+		})
+
+		// 格式化时间
+		function dateFormat(oDate, fmt) {
+			var o = {
+				"M+": oDate.getMonth() + 1, //月份
+				"d+": oDate.getDate(), //日
+				"h+": oDate.getHours(), //小时
+				"m+": oDate.getMinutes(), //分
+				"s+": oDate.getSeconds(), //秒
+				"q+": Math.floor((oDate.getMonth() + 3) / 3), //季度
+				"S": oDate.getMilliseconds() //毫秒
+			};
+			if (/(y+)/.test(fmt)) {
+				fmt = fmt.replace(RegExp.$1, (oDate.getFullYear() + "").substr(4 - RegExp.$1.length));
+			}
+			for (var k in o) {
+				if (new RegExp("(" + k + ")").test(fmt)) {
+					fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k])
+						.length)));
+				}
+			}
+			return fmt;
+		}
+
+		function textbox(obj, min, max) {
+			obj.value = obj.value.replace(/[^\d]/g, '');
+			if (parseInt(obj.value) == obj.value && parseInt(obj.value) >= min && parseInt(obj.value) <= max) {} else {
+				if (parseInt(obj.value) < min) {
+					obj.value = min;
+				}
+				if (parseInt(obj.value) > max) {
+					obj.value = max;
+				}
+			}
+		}
+///*
+		login(function(respData){
+			get_device_url(0,"机库顶视频",respData.token,"2000012E", function(resp1) {  // 南运
+				get_device_url(1,"机库顶视频",respData.token,"20000125", function(resp2) {  // 暨阳
+					get_device_url(2,"机库顶视频",respData.token,"20000111", function(resp3) { // 邓阳
+						get_device_url(3,"机库左视频",respData.token,"2000011B", function(resp4) { // 璜南
+							get_device_url(4,"机库左视频",respData.token,"2000011F", function(resp5) { // 祝塘
+								get_device_url(5,"机库左视频",respData.token,"20000125", function(resp6) { // 芙蓉
+									get_device_url(6,"机库左视频",respData.token,"20000111", function(resp7) { // 芙蓉
+										initPlugin();
+									});
+								});
+							});
+						});
+					});
+				});
+			});
+		});
+
+//*/
+//initPlugin();
+
+
+		function login(callback) {
+			$.ajax({
+				url: "http://222.190.65.16:18085/sys/login",
+				data: JSON.stringify({
+					"captcha": "",
+					"password": "nanyun",
+					"username": "nanyun",
+					"uuid": ""
+				}),
+				contentType: "application/json",
+				type: "post",
+				// 设置头部属性
+				beforeSend: function(request) {
+					request.setRequestHeader("token", "");
+				},
+				success: function(resp) {
+					callback(resp);
+				}
+			})
+		}
+
+		function get_device_url(index,videoName,token,device, callback) {
+			console.log("get_device_url");
+			$.ajax({
+				url: "http://222.190.65.16:18085/api/v1/open/rtmp_url",
+				data: JSON.stringify({
+					"channel": 1,
+					"deviceSn": device,
+					"deviceType": 9001,
+					"version": "1.0"
+				}),
+				contentType: "application/json",
+				type: "post",
+				// 设置头部属性
+				beforeSend: function(request) {
+					request.setRequestHeader("token", token);
+				},
+				success: function(resp) {
+					console.log(resp.data);
+					for(var i=0;i<resp.data.length;i++){
+						if(resp.data[i].cameraName==videoName){
+							var url = resp.data[i].url;
+							url = url.replace(/10.136.140.84:554/, "222.190.65.16:554");
+							videoListJson.list[index].url = url;
+							break;						
+						}
+					}
+					callback(index);
+				}
+			})
+		}
+	</script>
+</html>
